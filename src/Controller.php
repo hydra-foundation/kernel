@@ -60,6 +60,6 @@ abstract class Controller
      */
     protected function abort(int|Status $status, string $message = ''): never
     {
-        throw new HttpException($status instanceof Status ? $status->value : $status, $message);
+        throw new HttpException(Status::toInt($status), $message);
     }
 }
