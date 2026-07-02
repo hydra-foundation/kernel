@@ -15,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * It ships here rather than being re-written in each app because it was byte-for-byte
  * identical across consumers — the same "framework, not skeleton" call as the rest
- * of this package. It's deliberately NOT in hydra/http: the {@see render()} helper
+ * of this package. It's deliberately NOT in hydrakit/http: the {@see render()} helper
  * couples to the {@see ViewInterface} seam, and http stays view-agnostic (a JSON
  * API controller uses {@see Responder} with no view at all). The kernel — the
  * opinionated app baseline — is the right home, and it takes only the view SEAM,
