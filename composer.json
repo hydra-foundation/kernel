@@ -32,14 +32,14 @@
     ],
     "require": {
         "php": ">=8.2",
-        "hydrakit/core": "*",
-        "hydrakit/http": "*",
-        "hydrakit/session": "*",
-        "hydrakit/event": "*",
-        "hydrakit/auth": "*",
-        "hydrakit/authorization": "*",
-        "hydrakit/nyholm": "*",
-        "hydrakit/view": "*",
+        "hydrakit/core": "^0.1",
+        "hydrakit/http": "^0.1",
+        "hydrakit/session": "^0.1",
+        "hydrakit/event": "^0.1",
+        "hydrakit/auth": "^0.1",
+        "hydrakit/authorization": "^0.1",
+        "hydrakit/nyholm": "^0.1",
+        "hydrakit/view": "^0.1",
         "psr/http-message": "^2.0",
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
@@ -49,5 +49,10 @@
         "phpunit/phpunit": "^11.0"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    }
 }
