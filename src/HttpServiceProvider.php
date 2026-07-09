@@ -16,8 +16,6 @@ use Hydra\Http\Responder;
 use Hydra\Http\RouteCache;
 use Hydra\Http\RouteScanner;
 use Hydra\Http\Router;
-use Hydra\Nyholm\NyholmRequestProvider;
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -27,9 +25,13 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Hydra app and used to be copied into each one's AppServiceProvider (the drift
  * this package exists to end).
  *
- * It binds only invariants: the PSR-17 factories, the request provider, the
- * emitter, the responder, the route cache, the router, the middleware pipeline,
- * and the HTTP kernel. Everything here is pure mechanism.
+ * It binds only invariants: the emitter, the responder, the route cache, the
+ * router, the middleware pipeline, and the HTTP kernel. Everything here is
+ * pure mechanism, and none of it names a PSR-7 vendor: the concrete PSR-17
+ * factories and the request provider are supplied by a separately-registered
+ * provider (nyholm's NyholmServiceProvider by default) — this provider only
+ * consumes those interfaces from the container. Swapping PSR-7 libraries is a
+ * composition-root change, not a kernel change.
  *
  * The two things that are NOT invariant — which controllers to route and which
  * middleware to run — are the app's policy, passed in as plain data at
@@ -59,16 +61,6 @@ final class HttpServiceProvider extends ServiceProvider
 
     public function register(ContainerInterface $container): void
     {
-        // nyholm's Psr17Factory implements every PSR-17 factory interface.
-        $container->singleton(Psr17Factory::class, fn () => new Psr17Factory);
-        $container->singleton(ResponseFactoryInterface::class, fn () => $container->get(Psr17Factory::class));
-        $container->singleton(StreamFactoryInterface::class, fn () => $container->get(Psr17Factory::class));
-
-        // Capture the incoming request from PHP globals (nyholm behind our seam).
-        $container->singleton(ServerRequestProviderInterface::class, function () use ($container) {
-            return NyholmRequestProvider::create($container->get(Psr17Factory::class));
-        });
-
         // Send the response.
         $container->singleton(EmitterInterface::class, fn () => new Emitter);
 

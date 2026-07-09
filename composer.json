@@ -20,7 +20,6 @@
         { "type": "path", "url": "../event", "options": { "symlink": true } },
         { "type": "path", "url": "../auth", "options": { "symlink": true } },
         { "type": "path", "url": "../authorization", "options": { "symlink": true } },
-        { "type": "path", "url": "../nyholm", "options": { "symlink": true } },
         { "type": "path", "url": "../view", "options": { "symlink": true } },
         { "type": "path", "url": "../csrf", "options": { "symlink": true } }
     ],
@@ -38,15 +37,14 @@
         "hydrakit/event": "^0.1",
         "hydrakit/auth": "^0.1",
         "hydrakit/authorization": "^0.1",
-        "hydrakit/nyholm": "^0.1",
         "hydrakit/view": "^0.1",
         "psr/http-message": "^2.0",
         "psr/http-server-handler": "^1.0",
-        "psr/http-server-middleware": "^1.0",
-        "nyholm/psr7": "^1.8"
+        "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "nyholm/psr7": "^1.8"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
