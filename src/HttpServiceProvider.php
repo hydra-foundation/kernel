@@ -8,10 +8,12 @@ use Hydra\Core\Contracts\ContainerInterface;
 use Hydra\Core\Contracts\KernelInterface;
 use Hydra\Core\Providers\ServiceProvider;
 use Hydra\Http\Contracts\EmitterInterface;
+use Hydra\Http\Contracts\ErrorRendererInterface;
 use Hydra\Http\Contracts\ServerRequestProviderInterface;
 use Hydra\Http\Emitter;
 use Hydra\Http\HttpKernel;
 use Hydra\Http\Pipeline;
+use Hydra\Http\PlainTextErrorRenderer;
 use Hydra\Http\Responder;
 use Hydra\Http\RouteCache;
 use Hydra\Http\RouteScanner;
@@ -70,6 +72,14 @@ final class HttpServiceProvider extends ServiceProvider
                 $container->get(ResponseFactoryInterface::class),
                 $container->get(StreamFactoryInterface::class),
             );
+        });
+
+        // Default error renderer: plain text, matching the framework's long-time
+        // behaviour. Bound here so the ErrorHandlerMiddleware seam works with
+        // zero app wiring; an app rebinds ErrorRendererInterface to render
+        // HTML/htmx/JSON instead (content negotiation is the app's policy).
+        $container->singleton(ErrorRendererInterface::class, function () use ($container) {
+            return new PlainTextErrorRenderer($container->get(Responder::class));
         });
 
         // The compiled route cache, bound once so the web path (read-only) and

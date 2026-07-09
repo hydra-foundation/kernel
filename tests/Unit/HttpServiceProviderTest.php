@@ -6,7 +6,9 @@ namespace Hydra\Kernel\Tests\Unit;
 
 use Hydra\Core\Contracts\KernelInterface;
 use Hydra\Http\Contracts\EmitterInterface;
+use Hydra\Http\Contracts\ErrorRendererInterface;
 use Hydra\Http\Contracts\ServerRequestProviderInterface;
+use Hydra\Http\PlainTextErrorRenderer;
 use Hydra\Http\Responder;
 use Hydra\Http\RouteCache;
 use Hydra\Http\Router;
@@ -73,6 +75,17 @@ final class HttpServiceProviderTest extends TestCase
         $this->assertInstanceOf(Router::class, $this->container->get(Router::class));
         $this->assertInstanceOf(RequestHandlerInterface::class, $this->container->get(RequestHandlerInterface::class));
         $this->assertInstanceOf(KernelInterface::class, $this->container->get(KernelInterface::class));
+    }
+
+    public function test_binds_the_default_error_renderer(): void
+    {
+        // The ErrorRendererInterface seam resolves out of the box to the plain-text
+        // default, so the ErrorHandlerMiddleware works with zero app wiring; an app
+        // rebinds it to render HTML/htmx/JSON instead.
+        $this->assertInstanceOf(
+            PlainTextErrorRenderer::class,
+            $this->container->get(ErrorRendererInterface::class),
+        );
     }
 
     public function test_the_provider_binds_no_psr7_vendor(): void
