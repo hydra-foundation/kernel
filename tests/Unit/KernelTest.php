@@ -26,7 +26,7 @@ final class KernelTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new TestContainer;
-        $app = Kernel::application($this->container, __DIR__);
+        $app = Kernel::application($this->container, new Environment(__DIR__));
 
         $this->assertInstanceOf(Application::class, $app);
     }

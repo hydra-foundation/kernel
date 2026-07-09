@@ -35,16 +35,23 @@ final class Kernel
      * register the standard provider stack. Returns the {@see Application} so the
      * caller chains its HttpServiceProvider and AppServiceProvider.
      *
-     * Providers are registered, not booted — booting is the caller's lifecycle
-     * (the HTTP path boots via {@see Application::run()}; the console only
-     * resolves bindings, which registration alone makes available).
+     * The caller constructs the {@see Environment} and passes it in — parsing
+     * `.env` happens exactly once per request, in the app's bootstrap, and every
+     * consumer (the bootstrap's own config reads and everything resolved from
+     * the container) shares that one instance.
+     *
+     * Providers are registered, not booted — booting is the caller's lifecycle.
+     * EVERY entrypoint must boot before doing real work (boot() is where
+     * cross-provider wiring such as event-listener registration happens): the
+     * HTTP path boots via {@see Application::run()}, and a console entrypoint
+     * calls {@see Application::boot()} explicitly before dispatching a command.
      */
-    public static function application(ContainerInterface $container, string $basePath): Application
+    public static function application(ContainerInterface $container, Environment $environment): Application
     {
         // The container must resolve itself (factories that need it ask for the
         // interface) and expose the environment every config object reads from.
         $container->instance(ContainerInterface::class, $container);
-        $container->instance(Environment::class, new Environment($basePath));
+        $container->instance(Environment::class, $environment);
 
         return (new Application($container))
             ->register(new SessionServiceProvider)

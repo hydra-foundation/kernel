@@ -74,8 +74,10 @@ final class HttpServiceProvider extends ServiceProvider
 
         // The compiled route cache, bound once so the web path (read-only) and
         // the route:cache / route:cache:clear console commands (the writers)
-        // agree on a single artifact location.
-        $container->singleton(RouteCache::class, fn () => new RouteCache($this->routeCachePath));
+        // agree on a single artifact location. The controllers list is baked in
+        // so load() can reject an artifact compiled from a different list (see
+        // RouteCache's fingerprint docs) instead of serving stale routes.
+        $container->singleton(RouteCache::class, fn () => new RouteCache($this->routeCachePath, $this->controllers));
 
         // Router, populated from controller #[Route] attributes. Routing misses
         // (404/405) are thrown as HttpExceptions and rendered by the pipeline's
@@ -114,8 +116,9 @@ final class HttpServiceProvider extends ServiceProvider
      * `route:cache` console command, run at deploy time. With the cache off (the
      * default — dev wants #[Route] edits to take effect at once) it scans the
      * controllers on every boot. With it on it loads the cached file, or falls
-     * back to a live scan when the cache is cold (a forgotten `route:cache`
-     * degrades to uncached-but-correct, never broken).
+     * back to a live scan when the cache is cold OR stale — load() returns null
+     * when the artifact was compiled from a different controllers list (a
+     * forgotten `route:cache` degrades to uncached-but-correct, never broken).
      *
      * @return list<array{method: string, path: string, handler: array{0: class-string, 1: string}, middleware: list<class-string>}>
      */

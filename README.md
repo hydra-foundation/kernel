@@ -7,10 +7,12 @@ copied into each app and drift.
 
 ## What it ships
 
-- **`Kernel::application($container, $basePath)`** — builds the shared
-  composition root: binds the container and `Environment`, then registers the
-  standard provider stack in the correct order (`Session` → `Event` → `Auth` →
-  `Authorization`). Returns the `Application` so the app chains its own providers.
+- **`Kernel::application($container, $environment)`** — builds the shared
+  composition root: binds the container and the app-constructed `Environment`
+  (constructed once in the bootstrap, so `.env` is parsed exactly once per
+  request), then registers the standard provider stack in the correct order
+  (`Session` → `Event` → `Auth` → `Authorization`). Returns the `Application`
+  so the app chains its own providers.
   Adding a framework package to the stack is now a one-line edit here that every
   consumer picks up on `composer update`.
 - **`HttpServiceProvider`** — binds the invariant HTTP plumbing: the PSR-17
@@ -28,9 +30,10 @@ A consumer's bootstrap collapses to composing these with its own provider:
 public static function application(string $basePath): Application
 {
     $container = new Container(new \DI\Container);
-    $routeCache = RouteConfig::fromEnvironment(new Environment($basePath))->cache;
+    $environment = new Environment($basePath); // .env parsed once, shared by all
+    $routeCache = RouteConfig::fromEnvironment($environment)->cache;
 
-    return Kernel::application($container, $basePath)
+    return Kernel::application($container, $environment)
         ->register(new HttpServiceProvider(
             controllers: AppServiceProvider::CONTROLLERS,
             middleware:  AppServiceProvider::MIDDLEWARE,
